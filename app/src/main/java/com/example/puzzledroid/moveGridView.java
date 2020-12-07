@@ -6,6 +6,7 @@
 package com.example.puzzledroid;
 
 import android.content.Context;
+import android.media.SoundPool;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -30,6 +31,9 @@ public class moveGridView extends GridView {
     private float touchX;
     private float touchY;
     private Puzzle_view mypz;
+    private SoundPool soundPool;
+    private int sounditem;
+
 
 
 
@@ -64,6 +68,10 @@ public class moveGridView extends GridView {
 
     public void iniciar(final Context context) {
         mypz=new Puzzle_view();
+        soundPool=mypz.getSoundPool();
+        sounditem=soundPool.load(context,R.raw.uirefreshfeed,1);
+
+
         gestureDetector=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener()
         {
             @Override
@@ -84,8 +92,11 @@ public class moveGridView extends GridView {
                     if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE) {
 
                         mypz.moverPiezas(context, mypz.up, posicion);
+                        soundPool.play(sounditem,1,1,0,0,1);
+
                     } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE) {
                         mypz.moverPiezas(context, mypz.down, posicion);
+                        soundPool.play(sounditem,1,1,0,0,1);
                     }
                 }
                 else {
@@ -93,9 +104,11 @@ public class moveGridView extends GridView {
                     if (Math.abs(velocityX) < SWIPE_THRESHOLD_VELOCITY) {
                         return false;}
                         if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE) {
-                           mypz.moverPiezas(context, mypz.left, posicion);}
+                           mypz.moverPiezas(context, mypz.left, posicion);
+                            soundPool.play(sounditem,1,1,0,0,1);}
                         else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE) {
-                            mypz.moverPiezas(context, mypz.right, posicion); }
+                            mypz.moverPiezas(context, mypz.right, posicion);
+                            soundPool.play(sounditem,1,1,0,0,1);}
                     }// End else
 
                     return super.onFling(e1, e2, velocityX, velocityY);

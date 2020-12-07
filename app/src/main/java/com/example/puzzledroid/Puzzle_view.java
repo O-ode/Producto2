@@ -18,6 +18,9 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -71,8 +74,12 @@ public class Puzzle_view extends AppCompatActivity {
     private NotificationManagerCompat notificationManager;
     private int record;
 
-
     public static ConexionSQLite conexion;
+
+    // crear variable global tipo sounpool
+
+    private SoundPool soundPool;
+    private int pieceMovementSound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +91,7 @@ public class Puzzle_view extends AppCompatActivity {
         // Crear notification manager
 
         notificationManager=NotificationManagerCompat.from(this);
+
 
         Bundle mibundle = this.getIntent().getExtras();
         if (mibundle != null) {
@@ -107,6 +115,8 @@ public class Puzzle_view extends AppCompatActivity {
 
 
     }// End onCreate
+
+
 
     /*
     * En el método ondestroy activo la carga de puntuación de la jugada en el calendario
@@ -140,11 +150,36 @@ public class Puzzle_view extends AppCompatActivity {
             intent.putExtra(CalendarContract.Events.ALL_DAY,true);
             startActivity(intent);
         }
-    }
+    }//End ondestroy
 
     /*Constructor vacio de la clase*/
     public Puzzle_view() {
     }
+
+    public SoundPool getSoundPool() {
+
+        // Crear SoundPool
+
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
+
+            AudioAttributes audioAttributes=new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_GAME)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build();
+            soundPool=new SoundPool.Builder()
+                    .setMaxStreams(2)
+                    .setAudioAttributes(audioAttributes)
+                    .build();
+        }else {
+            soundPool=new SoundPool(2, AudioManager.STREAM_MUSIC,0);
+        }
+        return soundPool;
+    }
+
+    /*public int getPieceMovementSound() {
+        pieceMovementSound=soundPool.load(this,R.raw.uirefreshfeed,1);
+        return pieceMovementSound;
+    }*/
 
     /**
      * Método que convierte los ficheros guardados en los directorios de la memoria interna del
@@ -305,6 +340,7 @@ public class Puzzle_view extends AppCompatActivity {
         String nuevaPosicion=listaPiezas[posicion+arrastre];
         listaPiezas[posicion+arrastre]=listaPiezas[posicion];
         listaPiezas[posicion]=nuevaPosicion;
+        //soundPool.play(pieceMovementSound,1,1,0,0,1);
         display(context);
         if (isResuelto()) {
             Toast.makeText(context, "YOU WIN", Toast.LENGTH_SHORT).show();
@@ -314,18 +350,6 @@ public class Puzzle_view extends AppCompatActivity {
                     // ver valor mayor de puntuación antes de insertar nuevo registro
                     gestionaSiguientePaso();
                     Toast.makeText(context, "Se registraron los datos de la jugada", Toast.LENGTH_SHORT).show();
-
-                    // crear y mostrar notificacion
-                   /* if (getNewRecord()>record){
-                        record=getNewRecord();
-                        Notification notification=new NotificationCompat.Builder(this,CHANNEL_RECORDS_ID)
-                            .setSmallIcon(R.drawable.ic_baseline_notification_important_24)
-                            .setContentText(record+"")
-                            .setPriority(NotificationCompat.PRIORITY_HIGH)
-                            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                            .build();
-                        notificationManager.notify(1,notification);
-                    }*/
 
                 }
 
@@ -353,7 +377,7 @@ public class Puzzle_view extends AppCompatActivity {
 
         if(posicion==0){
             //solo podrá moverse hacia abajo y hacia la derecha
-            if (direccion.equals(right))intercambiaPieza(context,posicion,1);
+            if (direccion.equals(right)) intercambiaPieza(context,posicion,1);
             else if (direccion.equals(down))intercambiaPieza(context,posicion,columnas);
             else Toast.makeText(context,"Movimiento NO VALIDO",Toast.LENGTH_SHORT).show();
         }
