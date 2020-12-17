@@ -14,8 +14,7 @@ import android.view.MotionEvent;
 import android.widget.GridView;
 
 import android.annotation.TargetApi;
-import android.widget.ImageView;
-import android.widget.Toast;
+
 
 public class moveGridView extends GridView {
 
@@ -33,9 +32,6 @@ public class moveGridView extends GridView {
     private Puzzle_view mypz;
     private SoundPool soundPool;
     private int sounditem;
-
-
-
 
 
     /*
@@ -92,11 +88,11 @@ public class moveGridView extends GridView {
                     if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE) {
 
                         mypz.moverPiezas(context, mypz.up, posicion);
-                        soundPool.play(sounditem,1,1,0,0,1);
+                        soundPool.play(sounditem, (float) 0.2,(float)0.2,0,0,1);
 
                     } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE) {
                         mypz.moverPiezas(context, mypz.down, posicion);
-                        soundPool.play(sounditem,1,1,0,0,1);
+                        soundPool.play(sounditem,(float) 0.2,(float) 0.2,0,0,1);
                     }
                 }
                 else {
@@ -105,10 +101,10 @@ public class moveGridView extends GridView {
                         return false;}
                         if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE) {
                            mypz.moverPiezas(context, mypz.left, posicion);
-                            soundPool.play(sounditem,1,1,0,0,1);}
+                            soundPool.play(sounditem,(float) 0.2,(float) 0.2,0,0,1);}
                         else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE) {
                             mypz.moverPiezas(context, mypz.right, posicion);
-                            soundPool.play(sounditem,1,1,0,0,1);}
+                            soundPool.play(sounditem,(float) 0.2,(float) 0.2,0,0,1);}
                     }// End else
 
                     return super.onFling(e1, e2, velocityX, velocityY);
