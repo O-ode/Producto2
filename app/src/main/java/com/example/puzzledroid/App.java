@@ -14,7 +14,7 @@ import android.os.Build;
 public class App extends Application {
 
     public static final String CHANNEL_RECORDS_ID="channelRecords";
-
+    public static final String CHANNEL_MEDIA_ID="channelMedia";
 
     @Override
     public void onCreate() {
@@ -22,18 +22,31 @@ public class App extends Application {
 
         /*Hacemos la configuración de nuestro canales de notificación*/
         /*Método para crear el canal de notificación*/
-        createNotificationChannel();
+        createNotificationChannels();
     }
 
-    private void createNotificationChannel() {
+    private void createNotificationChannels() {
         if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+
+            //Canal de notificación para los records de puntuación
+
             NotificationChannel recordChannel=new NotificationChannel(
                     CHANNEL_RECORDS_ID,"Canal de Records",
                     NotificationManager.IMPORTANCE_HIGH
             );
             recordChannel.setDescription("Notificación de record");
+
+            //Canal de notificación para la música
+
+            NotificationChannel playmusicChannel=new NotificationChannel(
+                    CHANNEL_MEDIA_ID,"Canal de musica",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+
+
             NotificationManager manager=getSystemService(NotificationManager.class);
             manager.createNotificationChannel(recordChannel);
+            manager.createNotificationChannel(playmusicChannel);
         }
     }
 }
