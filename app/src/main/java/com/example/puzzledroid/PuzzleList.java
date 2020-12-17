@@ -51,6 +51,7 @@ public class PuzzleList extends AppCompatActivity {
     private RadioButton rdblevel3;
     private int niveljuego;
     String midireccionfoto;
+    private ArrayList<Integer> ImagesToQuit=new ArrayList<>();
 
     static final int REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE=2;
     static final int REQUEST_IMAGE_CAPTURE=1;
@@ -123,53 +124,26 @@ public class PuzzleList extends AppCompatActivity {
 
 
     /*
-    * Método para seleccionar imagen de galeria al clickar el floating button de galería
-    * */
+     * Método para seleccionar imagen de galeria al clickar el floating button de galería
+     * */
 
-    public void selectImagenFromGaleria(View view){
-        niveljuego=setLevelToJugador();
+    public void selectImagenFromGaleria(View view) {
 
-        Intent intent = new Intent(this, ImageToSplit.class);
-        intent.putExtra("niveljuego", niveljuego);
-        //solo si es multijugador le pasa el objeto jugador
-        if(!esmonojugador) {
-            intent.putExtra("jugador_activo", mijugador);
-        }else
-        {
-            intent.putExtra("esmonojugador",true);
-        }
-        intent.putExtra("ImagenUri", getRandomImage());
-        startActivity(intent);
-        /*if(ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     REQUEST_PERMISSION_READ_EXTERNAL_STORAGE);
-        } else{
+        } else {
 
 
-            Intent intent=new Intent(Intent.ACTION_GET_CONTENT);
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
-            startActivityForResult(intent,REQUEST_IMAGE_GALLERY);
-        }*/
-    }//End selectImagenFromGaleria
+            startActivityForResult(intent, REQUEST_IMAGE_GALLERY);
 
-    /*
-    * Método que preciso para poder recibir la imagen seleccionada en la galeria
-    * */
-    /*@Override
-    protected void onActivityResult(int codigoPedido,int codigoResultado, Intent datos) {
-
-        super.onActivityResult(codigoPedido, codigoResultado, datos);
-        if (codigoPedido == REQUEST_IMAGE_GALLERY && codigoResultado == RESULT_OK) {
-
-            //Uri uri = datos.getData();
-
-            Intent intent = new Intent(this, ImageToSplit.class);
-            intent.putExtra("ImagenUri", getRandomImage());
-            startActivity(intent);
         }
+    }
 
-    }*/
+
 
     /*
     * Método que devuelve un array de imágenes contenidas en la galeria
@@ -198,6 +172,9 @@ public class PuzzleList extends AppCompatActivity {
     public String getRandomImage(){
         Random r=new Random();
         int valor=r.nextInt(getGaleriaImagenes().size());
+        while(ImagesToQuit.contains(valor)){
+            valor=r.nextInt(getGaleriaImagenes().size());
+        }
         String nombreimagen=getGaleriaImagenes().get(valor);
         return nombreimagen;
     }
@@ -268,7 +245,7 @@ public class PuzzleList extends AppCompatActivity {
     }//End OnRequestPermissionResult
 
     /*
-    * Método que recibe la imagen de la cámara para enviarla a la actividad ImageToSplit
+    * Método que recibe la imagen de la cámara o de la galería para enviarla a la actividad ImageToSplit
     * */
 
     @Override
@@ -286,6 +263,20 @@ public class PuzzleList extends AppCompatActivity {
                 intent.putExtra("esmonojugador",true);
             }
             intent.putExtra("midireccionfoto", midireccionfoto);
+            startActivity(intent);
+        }
+
+        if (codigoPedido == REQUEST_IMAGE_GALLERY && codigoResultado == RESULT_OK) {
+
+            Intent intent = new Intent(this, ImageToSplit.class);
+            intent.putExtra("ImagenUri", getRandomImage());
+            //solo si es multijugador le pasa el objeto jugador
+            if(!esmonojugador) {
+                intent.putExtra("jugador_activo", mijugador);
+            }else
+            {
+                intent.putExtra("esmonojugador",true);
+            }
             startActivity(intent);
         }
     }

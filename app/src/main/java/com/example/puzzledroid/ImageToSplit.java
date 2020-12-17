@@ -30,6 +30,7 @@ import com.example.puzzledroid.entidades.Jugador;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,7 +68,11 @@ public class ImageToSplit extends AppCompatActivity {
         uriImagen=getIntent().getStringExtra("ImagenUri");
         midireccionArchivoFoto=getIntent().getStringExtra("midireccionfoto");
 
-        loadProperImageSource(myimage);
+        try {
+            loadProperImageSource(myimage);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         //setImagenFromAsset(nombrefichero,myimage);
         myimage.post(new Runnable() {
             @Override
@@ -412,13 +417,49 @@ public class ImageToSplit extends AppCompatActivity {
      * selección imagen , galeria o camara foto
      */
 
-    public void loadProperImageSource(ImageView imageView){
+    public void loadProperImageSource(ImageView imageView) throws FileNotFoundException {
 
             if(nombrefichero!=null){
                 setImagenFromAsset(nombrefichero,imageView);
             }else if(uriImagen!=null){
-                imageView.setImageURI(Uri.parse(uriImagen));
+                scaleGalleryImage(uriImagen,imageView);
             }else if(midireccionArchivoFoto!=null)
                 setImagenFromDireccionFoto(midireccionArchivoFoto,imageView);
+    }
+
+    /*
+    * Método para escalar correctamente la imagen que proviene de la galería
+    * */
+
+    public void scaleGalleryImage(String uriImagen,ImageView imageView) throws FileNotFoundException {
+
+        // Obtener las dimensiones del View
+
+        int anchura=imageView.getDrawable().getIntrinsicWidth();
+        int altura=imageView.getDrawable().getIntrinsicHeight();
+
+        // Ajustar la imagen como Uri a partir de su path
+
+        imageView.setImageURI(Uri.parse(uriImagen));
+
+        // Obtener las dimensiones después del ajuste
+
+        int anchurapost=imageView.getDrawable().getIntrinsicWidth();
+        int alturapost=imageView.getDrawable().getIntrinsicHeight();
+
+        // crear bitmap partiendo de la imagen ajustada ai imageview
+        BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+        Bitmap mibitmap = drawable.getBitmap();
+
+        int factorEscala=Math.min(anchura/anchurapost,altura/alturapost);
+
+        int anchurafinal=Math.round((float)factorEscala*anchurapost);
+        int alturafinal=Math.round((float)factorEscala*alturapost);
+
+        // Obtener nuevo bitmap escalado
+
+        Bitmap nuevobitmap=Bitmap.createScaledBitmap(mibitmap,anchurafinal,alturafinal,true);
+        imageView.setImageBitmap(nuevobitmap);
+
     }
 }
